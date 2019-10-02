@@ -211,39 +211,55 @@ bool ESP32RMT::Send(void)
 	if (uglyLen == 0)           return false;
 	if (strip == nullptr)       return false;
 
-	if (strip->description.bytesPerLED < 3) {
-		// adjust this function if size smaller then 3 is implemented !
-		return false;
-	}
-
 	uint8_t* pixelColor0 = strip->description.data;
 	uint8_t* pixelColor1 = strip->description.data;
 	uint8_t* pixelColor2 = strip->description.data;
 	uint8_t* pixelColor3 = strip->description.data;
+    uint8_t bpp = 0;
 
-	if (strip->description.colorType == DColorType::GRB) {
-		pixelColor0++;
-		pixelColor2 += 2;
-	}
-	else if (strip->description.colorType == DColorType::GRBW) {
-		pixelColor0++;
-		pixelColor2 += 2;
-		pixelColor3 += 3;
-	}
-	else return false;
+    switch (strip->description.colorType) {
+        case DColorType::GRB:
+    		pixelColor0++;
+	    	pixelColor2 += 2;
+            bpp = 3;
+            break;
+        case DColorType::GRBW:
+            pixelColor0++;
+            pixelColor2 += 2;
+            pixelColor3 += 3;
+            bpp = 4;
+            break;
+
+        default:
+            bpp = 0;
+            break;
+    }
+    if (bpp == 0 || bpp > 4) {
+	    return false;
+    }
 
 	uint16_t didx = 0;
-	uint8_t bpp = strip->description.bytesPerLED;
 	for (uint16_t i = 0; i < strip->description.stripLen; i++) {
-		ESP_LOGI(TAG, "%d %d %d", *pixelColor0, *pixelColor1, *pixelColor2);
-		Byte_to_rmtitem(*pixelColor0, didx); didx += 8; pixelColor0 += bpp;
-		Byte_to_rmtitem(*pixelColor1, didx); didx += 8; pixelColor1 += bpp;
-		Byte_to_rmtitem(*pixelColor2, didx); didx += 8; pixelColor2 += bpp;
-		if (bpp == 4) {
-			Byte_to_rmtitem(*pixelColor3, didx); didx += 8; pixelColor3 += bpp;
+		Byte_to_rmtitem(*pixelColor0, didx);
+        didx += 8;
+        pixelColor0 += bpp;
+
+        if (bpp > 1) {
+		    Byte_to_rmtitem(*pixelColor1, didx);
+            didx += 8;
+            pixelColor1 += bpp;
+        }
+        if (bpp > 2) {
+		    Byte_to_rmtitem(*pixelColor2, didx);
+            didx += 8;
+            pixelColor2 += bpp;
+        }
+		if (bpp > 3) {
+			Byte_to_rmtitem(*pixelColor3, didx);
+            didx += 8;
+            pixelColor3 += bpp;
 		}
 	}
-	ESP_LOGI(TAG, ".");
 
 	// change last bit to include reset time
 	didx--;

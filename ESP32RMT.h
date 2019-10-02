@@ -49,9 +49,11 @@ public:
 
 	/**
 	 * @brief Send data to RMT driver
-	 *
-	 * @attention: Call DStrips's FillTheBuffer function before calling this function
-	 * because data is sent from DStrip's data buffer
+     *
+     * This function works with 1, 2, 3 or 4 bytes per pixel but it currently implements only the:
+     * - GRB
+     * - GRBW
+     * DColorType modes an will return false if called for other modes.
 	 */
 	bool Send(void);
 
