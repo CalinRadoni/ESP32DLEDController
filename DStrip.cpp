@@ -31,6 +31,10 @@ DStrip::DStrip(void)
     description.dataLen = 0;
     description.bytesPerLED = 0;
 
+    description.geometry = DStripGeometry::Line;
+    description.nrows = 0;
+    description.ncols = 0;
+
     description.colorType = DColorType::Flat;
     description.T0H = 0;
     description.T0L = 0;
@@ -59,6 +63,8 @@ void DStrip::Destroy(void)
     description.bytesPerLED = 0;
 
     description.colorType = DColorType::Flat;
+
+    description.geometry = DStripGeometry::Line;
 }
 
 bool DStrip::Create(DLEDType stripType, uint16_t stripLength, uint8_t maxccv)
@@ -101,6 +107,10 @@ bool DStrip::Create(DLEDType stripType, uint16_t stripLength, uint8_t maxccv)
 
     description.stripLen = stripLength;
 
+    description.geometry = DStripGeometry::Line;
+    description.nrows = 1;
+    description.ncols = description.stripLen;
+
     maxCCV = maxccv;
 
     SetTimings();
@@ -134,9 +144,22 @@ void DStrip::SetTimings(void)
     }
 }
 
+bool DStrip::SetGeometry(DStripGeometry geometry, uint16_t rows, uint16_t cols)
+{
+    if (rows == 0) return false;
+    if (cols == 0) return false;
+
+    description.geometry = geometry;
+    description.nrows = rows;
+    description.ncols = cols;
+
+    return true;
+}
+
 void DStrip::SetPixel(uint16_t idx, uint8_t r, uint8_t g, uint8_t b)
 {
     if (description.data == nullptr) return;
+    if (description.bytesPerLED != 3) return;
     if (idx >= description.stripLen) return;
 
     uint8_t* pixel = description.data;
@@ -145,15 +168,12 @@ void DStrip::SetPixel(uint16_t idx, uint8_t r, uint8_t g, uint8_t b)
     *pixel = r; pixel++;
     *pixel = g; pixel++;
     *pixel = b;
-    if (description.bytesPerLED == 4) {
-        pixel++;
-        *pixel = 0;
-    }
 }
 
 void DStrip::SetPixel(uint16_t idx, uint8_t r, uint8_t g, uint8_t b, uint8_t w)
 {
     if (description.data == nullptr) return;
+    if (description.bytesPerLED != 4) return;
     if (idx >= description.stripLen) return;
 
     uint8_t* pixel = description.data;
@@ -161,11 +181,8 @@ void DStrip::SetPixel(uint16_t idx, uint8_t r, uint8_t g, uint8_t b, uint8_t w)
 
     *pixel = r; pixel++;
     *pixel = g; pixel++;
-    *pixel = b;
-    if (description.bytesPerLED == 4) {
-        pixel++;
-        *pixel = w;
-    }
+    *pixel = b; pixel++;
+    *pixel = w;
 }
 
 void DStrip::SetPixel(uint16_t idx, uint32_t color)
@@ -177,11 +194,73 @@ void DStrip::SetPixel(uint16_t idx, uint32_t color)
     pixel += idx * description.bytesPerLED;
 
     *pixel = (uint8_t) ((color >> 16) & 0x000000FF);
-    pixel++;
-    *pixel = (uint8_t) ((color >> 8) & 0x000000FF);
-    pixel++;
-    *pixel = (uint8_t) (color & 0x000000FF);
-    if (description.bytesPerLED == 4) {
+    if (description.bytesPerLED > 1) {
+        pixel++;
+        *pixel = (uint8_t) ((color >> 8) & 0x000000FF);
+    }
+    if (description.bytesPerLED > 2) {
+        pixel++;
+        *pixel = (uint8_t) (color & 0x000000FF);
+    }
+    if (description.bytesPerLED > 3) {
+        pixel++;
+        *pixel = (uint8_t) ((color >> 24) & 0x000000FF);
+    }
+}
+
+void DStrip::SetPixel(uint16_t row, uint16_t col, uint8_t r, uint8_t g, uint8_t b)
+{
+    if (description.data == nullptr) return;
+    if (description.bytesPerLED != 3) return;
+
+    uint16_t idx = row * description.ncols + col;
+    if (idx >= description.stripLen) return;
+
+    uint8_t* pixel = description.data;
+    pixel += idx * description.bytesPerLED;
+
+    *pixel = r; pixel++;
+    *pixel = g; pixel++;
+    *pixel = b;
+}
+
+void DStrip::SetPixel(uint16_t row, uint16_t col, uint8_t r, uint8_t g, uint8_t b, uint8_t w)
+{
+    if (description.data == nullptr) return;
+    if (description.bytesPerLED != 4) return;
+
+    uint16_t idx = row * description.ncols + col;
+    if (idx >= description.stripLen) return;
+
+    uint8_t* pixel = description.data;
+    pixel += idx * description.bytesPerLED;
+
+    *pixel = r; pixel++;
+    *pixel = g; pixel++;
+    *pixel = b; pixel++;
+    *pixel = w;
+}
+
+void DStrip::SetPixel(uint16_t row, uint16_t col, uint32_t color)
+{
+    if (description.data == nullptr) return;
+
+    uint16_t idx = row * description.ncols + col;
+    if (idx >= description.stripLen) return;
+
+    uint8_t* pixel = description.data;
+    pixel += idx * description.bytesPerLED;
+
+    *pixel = (uint8_t) ((color >> 16) & 0x000000FF);
+    if (description.bytesPerLED > 1) {
+        pixel++;
+        *pixel = (uint8_t) ((color >> 8) & 0x000000FF);
+    }
+    if (description.bytesPerLED > 2) {
+        pixel++;
+        *pixel = (uint8_t) (color & 0x000000FF);
+    }
+    if (description.bytesPerLED > 3) {
         pixel++;
         *pixel = (uint8_t) ((color >> 24) & 0x000000FF);
     }

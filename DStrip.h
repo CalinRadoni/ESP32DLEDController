@@ -44,6 +44,12 @@ enum class DColorType
     GRBW            /*!< RGBW digital LEDs using GRBW format */
 };
 
+enum class DStripGeometry
+{
+    Line,   /*!< All the pixel are in a single line */
+    Grid    /*!< The pixels are in a grid */
+};
+
 struct DStripDescription
 {
 	DLEDType   type;        /*!< type of digital LEDs */
@@ -52,6 +58,10 @@ struct DStripDescription
     uint8_t*   data;        /*!< color values are kept here in RGB or RGBW order */
     uint16_t   dataLen;     /*!< number of bytes of data buffer */
 	uint8_t    bytesPerLED; /*!< number of bytes per LED */
+
+    DStripGeometry geometry;
+    uint16_t       nrows;   /*!< number of rows */
+    uint16_t       ncols;   /*!< number of columns */
 
     DColorType colorType;   /*!< type of color order */
     uint16_t   T0H, T0L;    /*!< timings of the communication protocol */
@@ -82,6 +92,15 @@ public:
     bool Create(DLEDType stripType, uint16_t stripLength, uint8_t maxccv);
 
     /**
+     * @brief Set the strip's geometry
+     *
+     * @param[in] geometry
+     * @param[in] rows     Number of rows
+     * @param[in] cols     Number of columns
+     */
+    bool SetGeometry(DStripGeometry geometry, uint16_t rows, uint16_t cols);
+
+    /**
      * @brief Destroy the buffers and set strip's type to NULL
      */
     void Destroy(void);
@@ -100,6 +119,21 @@ public:
      * @brief Set pixel's color using a WRGB 32-bit value
      */
     void SetPixel(uint16_t idx, uint32_t color);
+
+    /**
+     * @brief Set pixel's color using r, g and b components
+     */
+    void SetPixel(uint16_t row, uint16_t col, uint8_t r, uint8_t g, uint8_t b);
+
+    /**
+     * @brief Set pixel's color using r, g, b and w components
+     */
+    void SetPixel(uint16_t row, uint16_t col, uint8_t r, uint8_t g, uint8_t b, uint8_t w);
+
+    /**
+     * @brief Set pixel's color using a WRGB 32-bit value
+     */
+    void SetPixel(uint16_t row, uint16_t col, uint32_t color);
 
     /**
      * @brief Set a pixel's color from a simple rainbow palette.
