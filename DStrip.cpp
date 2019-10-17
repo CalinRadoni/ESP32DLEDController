@@ -24,7 +24,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 DStrip::DStrip(void)
 {
-    description.type = DLEDType::notset;
     description.stripLen = 0;
 
     description.data = nullptr;
@@ -34,13 +33,6 @@ DStrip::DStrip(void)
     description.geometry = DStripGeometry::Line;
     description.nrows = 0;
     description.ncols = 0;
-
-    description.colorType = DColorType::Flat;
-    description.T0H = 0;
-    description.T0L = 0;
-    description.T1H = 0;
-    description.T1L = 0;
-    description.TRS = 0;
 
     maxCCV = 0;
 }
@@ -52,7 +44,6 @@ DStrip::~DStrip(void)
 
 void DStrip::Destroy(void)
 {
-    description.type = DLEDType::notset;
     description.stripLen = 0;
 
     if (description.data != nullptr) {
@@ -62,43 +53,22 @@ void DStrip::Destroy(void)
     description.dataLen = 0;
     description.bytesPerLED = 0;
 
-    description.colorType = DColorType::Flat;
-
     description.geometry = DStripGeometry::Line;
 }
 
-bool DStrip::Create(DLEDType stripType, uint16_t stripLength, uint8_t maxccv)
+bool DStrip::Create(uint8_t bytesPerLED, uint16_t stripLength, uint8_t maxccv)
 {
     Destroy();
 
 	if (stripLength == 0) return false;
+	if (bytesPerLED == 0) return false;
 
-    switch(stripType) {
-        case DLEDType::WS2812:
-        case DLEDType::WS2812B:
-        case DLEDType::WS2812D:
-        case DLEDType::WS2813:
-        case DLEDType::WS2815:
-        case DLEDType::WS281x:
-            description.colorType = DColorType::GRB;
-            description.bytesPerLED = 3;
-            break;
-
-        default:
-            description.colorType = DColorType::Flat;
-            description.bytesPerLED = 0;
-            break;
-    }
-    if (description.bytesPerLED == 0) return false;
-
-    description.type = stripType;
+    description.bytesPerLED = bytesPerLED;
 
     description.dataLen = description.bytesPerLED * stripLength;
 	description.data = new (std::nothrow) uint8_t[description.dataLen];
 	if (description.data == nullptr) {
         description.dataLen = 0;
-        description.type = DLEDType::notset;
-        description.colorType = DColorType::Flat;
         description.bytesPerLED = 0;
         return false;
 	}
@@ -113,36 +83,9 @@ bool DStrip::Create(DLEDType stripType, uint16_t stripLength, uint8_t maxccv)
 
     maxCCV = maxccv;
 
-    SetTimings();
-
     return true;
 }
 
-void DStrip::SetTimings(void)
-{
-    /* Timings are from datasheets. DLED_WS281x timings should be good.
-     * See https://cpldcpu.wordpress.com for interesting investigations about timings. */
-
-    switch (description.type) {
-        case DLEDType::WS2812:
-            description.T0H = 350; description.T0L = 800; description.T1H = 700; description.T1L = 600; description.TRS = 50000;
-            break;
-        case DLEDType::WS2812B:
-        case DLEDType::WS2813:
-        case DLEDType::WS2815:
-            description.T0H = 300; description.T0L = 1090; description.T1H = 1090; description.T1L = 320; description.TRS = 280000;
-            break;
-        case DLEDType::WS2812D:
-            description.T0H = 400; description.T0L = 850; description.T1H = 800; description.T1L = 450; description.TRS = 50000;
-            break;
-        case DLEDType::WS281x:
-            description.T0H = 400; description.T0L = 850; description.T1H = 850; description.T1L = 400; description.TRS = 50000;
-            break;
-        default:
-            description.T0H = 0; description.T0L = 0; description.T1H = 0; description.T1L = 0; description.TRS = 0;
-            break;
-    }
-}
 
 bool DStrip::SetGeometry(DStripGeometry geometry, uint16_t rows, uint16_t cols)
 {

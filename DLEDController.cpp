@@ -120,10 +120,10 @@ void DLEDController::SetLEDs(uint8_t* data, uint16_t length, ESP32RMTChannel *ch
     if (channel == nullptr) return;
     if (bytesPerLED == 0) return;
 
-	uint8_t* pixelColor0 = strip->description.data;
-	uint8_t* pixelColor1 = strip->description.data;
-	uint8_t* pixelColor2 = strip->description.data;
-	uint8_t* pixelColor3 = strip->description.data;
+	uint8_t* pixelColor0 = data;
+	uint8_t* pixelColor1 = data;
+	uint8_t* pixelColor2 = data;
+	uint8_t* pixelColor3 = data;
 
     switch (colorOrder) {
         case LEDColorOrder::GRB:
@@ -183,7 +183,7 @@ void DLEDController::SetRMTItemsFromByte(uint8_t value)
 	while (mask != 0){
         if (channelIndex < channelBufLen)
             channelBuffer[channelIndex++] =
-                ((data & mask) != 0) ? rmtHI : rmtLO;
+                ((value & mask) != 0) ? rmtHI : rmtLO;
 		mask = mask >> 1;
 	}
 }

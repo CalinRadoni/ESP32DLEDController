@@ -59,7 +59,7 @@ public:
 
     bool SetLEDType(LEDType newtype);
 
-    SetLEDs(uint8_t* data, uint16_t length, ESP32RMTChannel *channel);
+    void SetLEDs(uint8_t* data, uint16_t length, ESP32RMTChannel *channel);
 
 protected:
     LEDType type;

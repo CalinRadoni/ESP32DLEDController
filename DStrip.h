@@ -34,7 +34,6 @@ enum class DStripGeometry
 
 struct DStripDescription
 {
-	DLEDType   type;        /*!< type of digital LEDs */
     uint16_t   stripLen;    /*!< number of pixels in the strip */
 
     uint8_t*   data;        /*!< color values are kept here in RGB or RGBW order */
@@ -44,11 +43,6 @@ struct DStripDescription
     DStripGeometry geometry;
     uint16_t       nrows;   /*!< number of rows */
     uint16_t       ncols;   /*!< number of columns */
-
-    DColorType colorType;   /*!< type of color order */
-    uint16_t   T0H, T0L;    /*!< timings of the communication protocol */
-    uint16_t   T1H, T1L;    /*!< timings of the communication protocol */
-    uint32_t   TRS;         /*!< reset timing of the communication protocol */
 };
 
 class DStrip
@@ -67,11 +61,11 @@ public:
     /**
      * @brief Create and set the strip data
      *
-     * @param[in]  stripType    The type of digital LEDs.
-     * @param[in]  stripLength  The number of digital LEDs.
-     * @param[in]  maxccv       The maximum value allowed for a color component.
+     * @param bytesPerLED The number of bytes for one digital LED.
+     * @param stripLength The number of digital LEDs.
+     * @param maxccv      The maximum value allowed for a color component.
      */
-    bool Create(DLEDType stripType, uint16_t stripLength, uint8_t maxccv);
+    bool Create(uint8_t bytesPerLED, uint16_t stripLength, uint8_t maxccv);
 
     /**
      * @brief Set the strip's geometry
@@ -169,10 +163,6 @@ public:
 private:
 	uint8_t maxCCV; /*!< maximum value allowed for a color component */
 
-    /**
-     * @brief Set the timing according the DLEDType
-     */
-    void SetTimings(void);
 };
 
 #endif
