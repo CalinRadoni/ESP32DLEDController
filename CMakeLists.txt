@@ -1,3 +1,7 @@
-idf_component_register( SRCS "DStrip.cpp"
-                            "ESP32RMT.cpp"
-                        INCLUDE_DIRS ".")
+idf_component_register( SRCS
+                            "DLEDController.cpp"
+                            "DStrip.cpp"
+                        INCLUDE_DIRS "."
+                        PRIV_REQUIRES
+                            ESP32RMT
+                        )

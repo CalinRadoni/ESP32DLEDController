@@ -17,32 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+// TODO: git move DStrip in Pixels
+
+
 #ifndef DStrip_H
 #define DStrip_H
 
 #include <stddef.h>
 #include <stdint.h>
-
-/**
- * @brief The type of digital LEDs.
- */
-enum class DLEDType
-{
-    notset,
-    WS2812,
-    WS2812B,
-    WS2812D,
-    WS2813,
-    WS2815,
-    WS281x     /*!< This value should work for all WS281* and clones */
-};
-
-enum class DColorType
-{
-    Flat,           /*!< To send the bytes as they are */
-    GRB,            /*!< WS281x, NeoPixels, ... */
-    GRBW            /*!< RGBW digital LEDs using GRBW format */
-};
 
 enum class DStripGeometry
 {
