@@ -1,4 +1,4 @@
-# DLED Controller
+# ESP32 DLED Controller
 
 Controls *WS2812B type* digital LEDs using the RMT peripheral of ESP32.
 
@@ -10,9 +10,11 @@ Here are some key points of this implementation:
 - the other `RMT` channels can be used as needed;
 - the `RMT` peripheral is used through `ESP-IDF`'s own driver.
 
-Right now the whole negative point is that this code uses a lot of RAM, *because of the 
-way the driver and peripheral works*, but this will change *if/when* the driver will be 
-updated with a hook in transmission code.
+Right now the negative point is that this code uses a lot of RAM, *because of the
+way the driver and peripheral works*.
+There is a way to add a hook in the driver's transmission code but considering the
+multithreading architecture of FreeRTOS this may add jitter creating visual artifacts,
+depending on application.
 
 ## About timings
 
@@ -27,19 +29,21 @@ In [Tim's Blog (cpldcpu)](https://cpldcpu.wordpress.com) are some interesting in
 
 ## Dependencies
 
-[Espressif IoT Development Framework](https://github.com/espressif/esp-idf).
+- [Espressif IoT Development Framework](https://github.com/espressif/esp-idf)
+- [ESP32RMT](https://github.com/CalinRadoni/ESP32RMT)
 
 ## Hardware details
 
-The code was tested on the following boards:
+The code ( with [ESP32RMT](https://github.com/CalinRadoni/ESP32RMT) ) was tested on the following boards:
 
 - ESP32-DevKitC board with a level convertor made from two 74HCT1G04 inverters
 - Dev33-DLED - uses SN74LV1T34 logic level shifter connected to an ESP32-WROOM-32 module
+- Dev34-DLEDGrid - uses SN74LV1T34 logic level shifter connected to an ESP32-WROOM-32 module
 
 and:
 
-- a LED strip with 300 WS2812B digital LEDs
-- Mean Well EPS-65S-5 power source
+- a LED strip with 300 WS2812B digital LEDs + Mean Well EPS-65S-5 power source
+- a 8x8 LED board with WS2812 digital LEDs + Sony VTC6 18650 Battery
 
 ## Development Environment
 
@@ -53,8 +57,8 @@ Version control with [Git](https://git-scm.com).
 
 ## License
 
-`DLED Controller` software and documentation is released under the [GNU GPLv3](http://www.gnu.org/licenses/gpl-3.0.html) License. See the `LICENSE-GPLv3.txt` file.
+This software and its documentation are released under the [GNU GPLv3](http://www.gnu.org/licenses/gpl-3.0.html) License. See the `LICENSE-GPLv3.txt` file.
 
 ## Note
 
-This should be a faster and more efficient version of the one published by me previously in the (esp32_digitalLEDs)[https://github.com/CalinRadoni/esp32_digitalLEDs] repository.
+This is a faster and more efficient version of the one published by me previously in the [esp32_digitalLEDs](https://github.com/CalinRadoni/esp32_digitalLEDs) repository.
