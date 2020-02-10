@@ -32,6 +32,10 @@ In [Tim's Blog (cpldcpu)](https://cpldcpu.wordpress.com) are some interesting in
 - [Espressif IoT Development Framework](https://github.com/espressif/esp-idf)
 - [ESP32RMT](https://github.com/CalinRadoni/ESP32RMT)
 
+## Example code
+
+In the `example` directory is an application that should control 64 Digital LEDs of WS2812 type, connected to the GPIO pin 14.
+
 ## Hardware details
 
 The code ( with [ESP32RMT](https://github.com/CalinRadoni/ESP32RMT) ) was tested on the following boards:
