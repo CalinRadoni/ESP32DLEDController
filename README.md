@@ -1,5 +1,7 @@
 # ESP32 DLED Controller
 
+[![Build Status](https://travis-ci.com/CalinRadoni/ESP32DLEDController.svg?branch=master)](https://travis-ci.com/CalinRadoni/ESP32DLEDController)
+
 Controls *WS2812B type* digital LEDs using the RMT peripheral of ESP32.
 
 This implementation uses the RMT driver from `ESP-IDF` and uses one `RMT` channel 
@@ -34,7 +36,7 @@ In [Tim's Blog (cpldcpu)](https://cpldcpu.wordpress.com) are some interesting in
 
 ## Example code
 
-In the `example` directory is an application that should control 64 Digital LEDs of WS2812 type, connected to the GPIO pin 14.
+In the `example` directory is an application that should control 64 Digital LEDs of WS2812 type, connected to the GPIO pin 14 through a non-inverting level converter.
 
 ## Hardware details
 
