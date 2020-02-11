@@ -36,10 +36,13 @@ install:
   - export PATH="$HOME/esp/xtensa-esp32-elf/bin:$PATH"
   - export IDF_PATH=~/esp/esp-idf
   - export PATH="$IDF_PATH/tools:$PATH"
-  - printenv PATH
   - python -m pip install --user -r $IDF_PATH/requirements.txt
 
 script:
+  - cd $TRAVIS_BUILD_DIR/..
+  - git clone https://github.com/CalinRadoni/ESP32RMT.git
+  - cd $TRAVIS_BUILD_DIR
+  - ls -Al *
   - cd $TRAVIS_BUILD_DIR/example
   - idf.py reconfigure
   - idf.py build
