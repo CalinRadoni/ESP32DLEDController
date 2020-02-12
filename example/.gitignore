@@ -1,8 +1,4 @@
-# ignore archives
-*.7z
-*.zip
-
-# ingnore esp-idf's build directory sdkconfig files
+# ignore ESP-IDF's generated files
 /build/
 /sdkconfig
 /sdkconfig.old
