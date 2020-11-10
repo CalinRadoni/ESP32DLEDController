@@ -24,6 +24,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdint.h>
 #include "DStrip.h"
 #include "ESP32RMTChannel.h"
+#include "freertos/task.h"
+#include "freertos/semphr.h"
 
 /**
  * @brief The type of digital LEDs.
@@ -59,10 +61,13 @@ public:
 
     bool SetLEDType(LEDType newtype);
 
+    void SetMutex(SemaphoreHandle_t);
+
     void SetLEDs(uint8_t* data, uint16_t length, ESP32RMTChannel *channel);
 
 protected:
     LEDType type;
+    SemaphoreHandle_t mutex;
 
     /**
      * @brief Set the properties based on LEDType

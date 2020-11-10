@@ -19,11 +19,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "DLEDController.h"
 
+const TickType_t xBlockTime = 10000 / portTICK_PERIOD_MS; // set timeout to 10 seconds
+
 DLEDController::DLEDController(void)
 {
     type = LEDType::notset;
     colorOrder = LEDColorOrder::Flat;
     bytesPerLED = 0;
+
+    mutex = NULL;
 }
 
 DLEDController::~DLEDController(void)
@@ -149,20 +153,31 @@ void DLEDController::SetLEDs(uint8_t* data, uint16_t length, ESP32RMTChannel *ch
     channelBufLen = channel->GetDataBufferLen();
     if (channelBufLen == 0) return;
 
+    if (mutex != NULL) {
+        // we have a mutex, let's try to take it
+        if (xSemaphoreTake(mutex, xBlockTime) == pdFALSE) {
+            // failed to take the mutex in 'xBlockTime', maybe at the next call ?
+            return;
+        }
+    }
+
 	channelIndex = 0;
-	uint16_t i = 0;
-    while (i < length) {
-		                       SetRMTItemsFromByte(*pixelColor0);
+    for (uint16_t i = 0; i < length; i += bytesPerLED) {
+                                SetRMTItemsFromByte(*pixelColor0);
         if (bytesPerLED > 1) { SetRMTItemsFromByte(*pixelColor1); }
         if (bytesPerLED > 2) { SetRMTItemsFromByte(*pixelColor2); }
-		if (bytesPerLED > 3) { SetRMTItemsFromByte(*pixelColor3); }
+        if (bytesPerLED > 3) { SetRMTItemsFromByte(*pixelColor3); }
 
         pixelColor0 += bytesPerLED;
         pixelColor1 += bytesPerLED;
         pixelColor2 += bytesPerLED;
         pixelColor3 += bytesPerLED;
-                  i += bytesPerLED;
-	}
+    }
+
+    if (mutex != NULL) {
+        // we took the mutex, now give it back
+        xSemaphoreGive(mutex);
+    }
 
 	// change last bit to include reset time
 	channelIndex--;
@@ -188,3 +203,7 @@ void DLEDController::SetRMTItemsFromByte(uint8_t value)
 	}
 }
 
+void DLEDController::SetMutex(SemaphoreHandle_t mutexIn)
+{
+    mutex = mutexIn;
+}
