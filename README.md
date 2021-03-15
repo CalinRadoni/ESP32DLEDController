@@ -18,6 +18,10 @@ There is a way to add a hook in the driver's transmission code but considering t
 multithreading architecture of FreeRTOS this may add jitter creating visual artifacts,
 depending on application.
 
+## Breaking changes
+
+v2 uses DStripData as input stream
+
 ## About timings
 
 Timings are from datasheets.
