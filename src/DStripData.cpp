@@ -19,13 +19,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "DStripData.h"
 
-// do not change this value without checking the code !
-const uint8_t bytesPerLED = 4;
+#include <new>
 
 DStripData::DStripData(void)
 {
     data = nullptr;
-    length = 0;
+    dataLength = 0;
+    stripLength = 0;
 }
 
 DStripData::~DStripData()
@@ -37,10 +37,14 @@ bool DStripData::Create(uint16_t numberOfLEDs)
 {
     Destroy();
 
-    length = numberOfLEDs * bytesPerLED;
-	data = new (std::nothrow) uint8_t[length];
+    if (numberOfLEDs == 0) return false;
+
+    stripLength = numberOfLEDs;
+    dataLength = stripLength * bytesPerLED;
+	data = new (std::nothrow) uint8_t[dataLength];
 	if (data == nullptr) {
-        length = 0;
+        dataLength = 0;
+        stripLength = 0;
         return false;
 	}
 
@@ -53,5 +57,6 @@ void DStripData::Destroy(void)
         delete[] data;
         data = nullptr;
     }
-    length = 0;
+    dataLength = 0;
+    stripLength = 0;
 }

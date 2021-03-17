@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <stddef.h>
 #include <stdint.h>
-#include "DStrip.h"
+#include "DStripData.h"
 #include "ESP32RMTChannel.h"
 #include "freertos/task.h"
 #include "freertos/semphr.h"
@@ -63,7 +63,7 @@ public:
 
     void SetMutex(SemaphoreHandle_t);
 
-    void SetLEDs(uint8_t* data, uint16_t length, ESP32RMTChannel *channel);
+    void SetLEDs(DStripData &stripData, ESP32RMTChannel &channel);
 
 protected:
     LEDType type;

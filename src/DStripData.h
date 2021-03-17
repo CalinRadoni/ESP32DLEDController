@@ -24,7 +24,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdint.h>
 
 /**
- * @brief Creates a memory buffer for a LED Strip with 4 bytes / LED.
+ * @brief Creates a memory buffer for a LED Strip.
+ *
+ * For compatibility with:
+ * - DLEDController class
+ * - [light-effects](https://github.com/CalinRadoni/light-effects) code
+ * the class will allocate 4 bytes / LED.
+ *
+ * DLEDController class and `light-effects` code are using **WRGB** format.
  */
 class DStripData
 {
@@ -36,11 +43,25 @@ public:
     void Destroy(void);
 
     uint8_t* Data(void) { return data; }
-    uint16_t Length(void) { return length; }
+    uint16_t DataLength(void) { return dataLength; }
+    uint16_t StripLength(void) { return stripLength; }
+    uint8_t  BytesPerLED(void) { return bytesPerLED; }
 
 protected:
     uint8_t *data;
-    uint16_t length;
+    uint16_t dataLength;
+    uint16_t stripLength;
+
+private:
+    //
+    /**
+     * @brief Number of bytes per LED for this strip
+     *
+     * - DLEDController class needs 4 bytes / LED, WRGB format
+     * - [light-effects](https://github.com/CalinRadoni/light-effects) code needs a buffer with 4 bytes per LED
+     *   and uses WRGB format
+     */
+    const uint8_t bytesPerLED = 4;
 };
 
 #endif
