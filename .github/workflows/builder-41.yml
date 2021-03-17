@@ -8,8 +8,8 @@ jobs:
     runs-on: ubuntu-20.04
 
     env:
-      main-path: app
-      app-path: app/example
+      main-path: ESP32DLEDController
+      app-path: ESP32DLEDController/example
 
     steps:
       - name: Checkout code
