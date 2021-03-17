@@ -1,6 +1,6 @@
 # ESP32 DLED Controller
 
-[![Build Status](https://travis-ci.com/CalinRadoni/ESP32DLEDController.svg?branch=master)](https://travis-ci.com/CalinRadoni/ESP32DLEDController)
+![Build with ESP-IDF v4.1](https://github.com/CalinRadoni/ESP32DLEDController/workflows/Build%20with%20ESP-IDF%20v4.1/badge.svg)
 
 Using the RMT peripheral of ESP32, controls *WS2812 type* digital LEDs: WS2812, WS2812B, WS2812C, WS2812D, WS2812S, WS2813 and WS2815. SK6812 should work with *WS281x* mode.
 

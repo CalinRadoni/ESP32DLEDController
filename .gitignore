@@ -1,0 +1,9 @@
+# ignore archives
+*.7z
+*.zip
+
+# ignore Visual Studio Code's workspace files
+*.code-workspace
+
+# ignore auxiliary directories
+/notes/

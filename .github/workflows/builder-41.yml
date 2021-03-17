@@ -1,0 +1,42 @@
+name: Build with ESP-IDF v4.1
+
+on: [push]
+
+jobs:
+  builder:
+    name: Builder for ESP32DLEDController example application
+    runs-on: ubuntu-20.04
+
+    env:
+      main-path: app
+      app-path: app/example
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          path: ${{ env.main-path }}
+
+      - name: Create the code library
+        run: |
+          mkdir -p "${{ github.workspace }}/lib/ESP32"
+          cd "${{ github.workspace }}/lib/ESP32"
+          git clone --depth 1 https://github.com/CalinRadoni/ESP32RMT.git
+
+      - name: Build
+        uses: CalinRadoni/esp-idf-v4-container-action@v4.1
+        id: idf_build
+        with:
+          entrypoint: /github/workspace/${{ env.app-path }}/action-build.sh
+
+      - name: Compute SHA256 for bin and elf files
+        if: steps.idf_build.outputs.result == 0
+        run: |
+          fileE=$(find "${{ github.workspace }}/${{ env.app-path }}/build" -maxdepth 1 -type f -name '*.elf')
+          fileB=${fileE%.elf}.bin
+          declare -a files
+          files=("$fileE" "$fileB")
+          for file in "${files[@]}"; do
+            hash=$(sha256sum -b "$file")
+            stat -c"${hash%% *} ${file##*/} %s" "$file"
+          done
