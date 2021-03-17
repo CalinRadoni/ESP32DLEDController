@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.com/CalinRadoni/ESP32DLEDController.svg?branch=master)](https://travis-ci.com/CalinRadoni/ESP32DLEDController)
 
-Controls *WS2812B type* digital LEDs using the RMT peripheral of ESP32.
+Using the RMT peripheral of ESP32, controls *WS2812 type* digital LEDs: WS2812, WS2812B, WS2812C, WS2812D, WS2812S, WS2813 and WS2815. SK6812 should work with *WS281x* mode.
 
 This implementation uses the RMT driver from `ESP-IDF` and uses one `RMT` channel 
 for a LED strip **leaving the other channels free, under the control of the RMT driver**.
@@ -20,7 +20,12 @@ depending on application.
 
 ## Breaking changes
 
-v2 uses DStripData as input stream
+### DLEDController v2
+
+- uses DStripData as input stream.
+- DStrip class was obsoleted and removed.
+
+See the `example` for simple usage.
 
 ## About timings
 
@@ -57,9 +62,7 @@ and:
 
 ## Development Environment
 
-Main tools used where [Espressif IoT Development Framework](https://github.com/espressif/esp-idf) and *ESP32 toolchain for Linux*
-(see [Standard Setup of Toolchain for Linux](https://github.com/espressif/esp-idf/blob/master/docs/get-started/linux-setup.rst)
-for the latest version).
+Currently uses the latest stable version of [Espressif IoT Development Framework](https://github.com/espressif/esp-idf), v4.1 as of December 2020.
 
 Editing was done in [Visual Studio Code](https://code.visualstudio.com).
 
