@@ -1,7 +1,7 @@
 /**
 This file is part of ESP32DLEDController esp-idf component
 (https://github.com/CalinRadoni/ESP32DLEDController)
-Copyright (C) 2020+ by Calin Radoni
+Copyright (C) 2020 by Calin Radoni
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -25,8 +25,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "nvs_flash.h"
 
 #include "ESP32RMTChannel.h"
-#include "DStrip.h"
+#include "DStripData.h"
 #include "DLEDController.h"
+
+#include "colorutils.h"
 
 #include "sdkconfig.h"
 
@@ -35,9 +37,10 @@ const char* TAG = "Init";
 static const uint8_t  cfgOutputPin = 14;    // the GPIO where LEDs are connected
 static const uint8_t  cfgChannel   = 0;     // ESP32 RMT's channel [0 ... 7]
 static const uint16_t cfgLEDcount  = 64;    // 64 LEDS
-static const uint8_t  cfgMaxCCV    = 32;    // maximum value allowed for color component
 
-DStrip strip;
+const uint8_t  cfgMaxCCV    = 32;    // maximum value allowed for color component
+
+DStripData stripData;
 DLEDController LEDcontroller;
 ESP32RMTChannel rmtChannel;
 
@@ -51,24 +54,24 @@ extern "C" {
     }
 
     static void DisplayTask(void *taskParameter) {
-        strip.Create(3, cfgLEDcount, cfgMaxCCV);
+        stripData.Create(cfgLEDcount);
         rmtChannel.Initialize((rmt_channel_t)cfgChannel, (gpio_num_t)cfgOutputPin, cfgLEDcount * 24);
         rmtChannel.ConfigureForWS2812x();
         LEDcontroller.SetLEDType(LEDType::WS2812);
 
         uint16_t step = 0;
-        while (step < 6 * strip.description.stripLen) {
-            strip.MovePixel(step);
+        while (step < 6 * stripData.StripLength()) {
+            MovePixel(step);
             step++;
-            LEDcontroller.SetLEDs(strip.description.data, strip.description.dataLen, &rmtChannel);
+            LEDcontroller.SetLEDs(stripData, rmtChannel);
             delay_ms(20);
         }
 
         step = 0;
         for (;;) {
-            strip.RainbowStep(step);
+            RainbowStep(step);
             step++;
-            LEDcontroller.SetLEDs(strip.description.data, strip.description.dataLen, &rmtChannel);
+            LEDcontroller.SetLEDs(stripData, rmtChannel);
             delay_ms(20);
         }
 

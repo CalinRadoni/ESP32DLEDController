@@ -1,7 +1,7 @@
 /**
 This file is part of ESP32DLEDController esp-idf component
 (https://github.com/CalinRadoni/ESP32DLEDController)
-Copyright (C) 2019+ by Calin Radoni
+Copyright (C) 2019 by Calin Radoni
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <stddef.h>
 #include <stdint.h>
-#include "DStrip.h"
+#include "DStripData.h"
 #include "ESP32RMTChannel.h"
 #include "freertos/task.h"
 #include "freertos/semphr.h"
@@ -63,7 +63,7 @@ public:
 
     void SetMutex(SemaphoreHandle_t);
 
-    void SetLEDs(uint8_t* data, uint16_t length, ESP32RMTChannel *channel);
+    void SetLEDs(DStripData &stripData, ESP32RMTChannel &channel);
 
 protected:
     LEDType type;

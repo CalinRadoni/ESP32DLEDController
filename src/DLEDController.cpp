@@ -1,7 +1,7 @@
 /**
 This file is part of ESP32DLEDController esp-idf component
 (https://github.com/CalinRadoni/ESP32DLEDController)
-Copyright (C) 2019+ by Calin Radoni
+Copyright (C) 2019 by Calin Radoni
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -117,27 +117,47 @@ void DLEDController::SetTimingsForRMT(void)
 	rmtHR.duration1 = wsTRS / rmt_clk_duration;
 }
 
-void DLEDController::SetLEDs(uint8_t* data, uint16_t length, ESP32RMTChannel *channel)
+void DLEDController::SetLEDs(DStripData &stripData, ESP32RMTChannel &channel)
 {
-    if (data == nullptr) return;
-    if (length == 0) return;
-    if (channel == nullptr) return;
     if (bytesPerLED == 0) return;
+
+    uint8_t* data = stripData.Data();
+    uint16_t stripLen = stripData.StripLength();
+    uint8_t inputBPL = stripData.BytesPerLED();
+
+    if (data == nullptr) return;
+    if (stripLen == 0) return;
 
 	uint8_t* pixelColor0 = data;
 	uint8_t* pixelColor1 = data;
 	uint8_t* pixelColor2 = data;
 	uint8_t* pixelColor3 = data;
 
+    /**
+     * @brief DStripData should be 4 bytes per pixel, WRGB format
+     *
+     * data = white
+     * data + 1 = red
+     * data + 2 = green
+     * data + 3 = blue
+     */
+
     switch (colorOrder) {
         case LEDColorOrder::GRB:
-    		pixelColor0++;
-	    	pixelColor2 += 2;
+	    	pixelColor0 += 2;
+	    	pixelColor1 += 1;
+	    	pixelColor2 += 3;
             break;
         case LEDColorOrder::GRBW:
-            pixelColor0++;
-            pixelColor2 += 2;
-            pixelColor3 += 3;
+	    	pixelColor0 += 2;
+	    	pixelColor1 += 1;
+	    	pixelColor2 += 3;
+            break;
+
+        case LEDColorOrder::Flat:
+	    	pixelColor1 += 1;
+	    	pixelColor2 += 2;
+	    	pixelColor3 += 3;
             break;
 
         default:
@@ -148,9 +168,9 @@ void DLEDController::SetLEDs(uint8_t* data, uint16_t length, ESP32RMTChannel *ch
 	    return;
     }
 
-    channelBuffer = channel->GetDataBuffer();
+    channelBuffer = channel.GetDataBuffer();
     if (channelBuffer == nullptr) return;
-    channelBufLen = channel->GetDataBufferLen();
+    channelBufLen = channel.GetDataBufferLen();
     if (channelBufLen == 0) return;
 
     if (mutex != NULL) {
@@ -162,16 +182,16 @@ void DLEDController::SetLEDs(uint8_t* data, uint16_t length, ESP32RMTChannel *ch
     }
 
 	channelIndex = 0;
-    for (uint16_t i = 0; i < length; i += bytesPerLED) {
-                                SetRMTItemsFromByte(*pixelColor0);
+    for (uint16_t i = 0; i < stripLen; ++i) {
+                               SetRMTItemsFromByte(*pixelColor0);
         if (bytesPerLED > 1) { SetRMTItemsFromByte(*pixelColor1); }
         if (bytesPerLED > 2) { SetRMTItemsFromByte(*pixelColor2); }
         if (bytesPerLED > 3) { SetRMTItemsFromByte(*pixelColor3); }
 
-        pixelColor0 += bytesPerLED;
-        pixelColor1 += bytesPerLED;
-        pixelColor2 += bytesPerLED;
-        pixelColor3 += bytesPerLED;
+        pixelColor0 += inputBPL;
+        pixelColor1 += inputBPL;
+        pixelColor2 += inputBPL;
+        pixelColor3 += inputBPL;
     }
 
     if (mutex != NULL) {
@@ -188,7 +208,7 @@ void DLEDController::SetLEDs(uint8_t* data, uint16_t length, ESP32RMTChannel *ch
 		channelBuffer[channelIndex] = rmtLR;
 	}
 
-    channel->SendData();
+    channel.SendData();
 }
 
 void DLEDController::SetRMTItemsFromByte(uint8_t value)
